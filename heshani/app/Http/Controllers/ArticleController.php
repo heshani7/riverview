@@ -105,7 +105,7 @@ class ArticleController extends Controller {
         $article->delete();
 
         return response()->json([
-                    'message' => 'book deleted',
+                    'message' => 'Article deleted',
                         ], 200);
     }
 
