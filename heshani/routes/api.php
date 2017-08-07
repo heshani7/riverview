@@ -19,4 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'auth.basic'], function () {
     Route::get('/api/articles', 'ArticleController@index');
+    Route::get('/api/articles/{id}', 'ArticleController@show');
+    Route::post('/api/articles', 'ArticleController@store');
+    Route::put('/api/articles/{id}', 'ArticleController@update');
+    Route::delete('/api/articles/{id}', 'ArticleController@destroy');
 });

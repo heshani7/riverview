@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Article;
@@ -16,35 +15,15 @@ class ArticleController extends Controller {
      */
     public function index() {
 
-        //$articles = Article::paginate(10);
-        $articles = DB::table('article')
-                ->select('article.id', 'article.author_id', 'article.title', 'article.url', 'article.content', 'author.name as author_name')
-                ->join('author', 'article.author_id', '=', 'author.id')
-                ->get();
+        $articles = Article::paginate(10);
 
         if (!$articles) {
             throw new HttpException(400, "Invalid data");
         }
 
-        $data['j_articles'] = json_encode($articles);
-
-//        $data['articles'] =response()->json([
-//            $articles,
-//        ], 200);
-
-        return view('template', $data);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create() {
-
-        $data['authors'] = DB::table('author')->get();
-
-        return view('add_article', $data);
+        return response()->json(
+                        $articles, 200
+        );
     }
 
     /**
@@ -54,12 +33,6 @@ class ArticleController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-
-        $this->validate($request, [
-            'title' => 'required|unique:posts|max:255',
-            'author_id' => 'required'
-        ]);
-
         $article = new Article;
         $article->title = $request->input('title');
         $article->author_id = $request->input('author_id');
@@ -79,27 +52,16 @@ class ArticleController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request) {
+    public function show($id) {
+        if (!$id) {
+            throw new HttpException(400, "Invalid id");
+        }
 
-        $id = $request->input('id');
+        $article = Article::find($id);
 
-        $data['article'] = DB::table('article')
-                ->select('article.id', 'article.author_id', 'article.title', 'article.url', 'article.content', 'author.name as author_name')
-                ->join('author', 'article.author_id', '=', 'author.id')
-                ->where('article.id', $id)
-                ->first();
-
-        return view('edit_article', $data);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id) {
-        //
+        return response()->json([
+                    $article,
+                        ], 200);
     }
 
     /**
@@ -134,6 +96,7 @@ class ArticleController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
+
         if (!$id) {
             throw new HttpException(400, "Invalid id");
         }
@@ -142,7 +105,7 @@ class ArticleController extends Controller {
         $article->delete();
 
         return response()->json([
-                    'message' => 'Article deleted',
+                    'message' => 'book deleted',
                         ], 200);
     }
 
